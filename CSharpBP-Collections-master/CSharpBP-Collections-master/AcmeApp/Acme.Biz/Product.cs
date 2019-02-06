@@ -18,7 +18,12 @@ namespace Acme.Biz
         {
             string[] colorOptions = { "Red", "Espresso", "White", "Navy" };
 
-            Console.WriteLine(colorOptions[1]);
+            //for (int i = 0; i < colorOptions.Length; i++)
+            //{
+            //    Console.WriteLine($"The color is {colorOptions[i]}");
+            //}
+
+            
         }
         public Product(int productId,
                         string productName,
@@ -87,8 +92,21 @@ namespace Acme.Biz
         /// </summary>
         /// <param name="markupPercent">Percent used to mark up the cost.</param>
         /// <returns></returns>
-        public decimal CalculateSuggestedPrice(decimal markupPercent) =>
-             this.Cost + (this.Cost * markupPercent / 100);
+        public OperationResult<decimal> CalculateSuggestedPrice(decimal markupPercent)
+        {
+            var message = "";
+
+            if (markupPercent <= 0m)
+                message = "Invalid markup percentage";
+            else if (markupPercent < 10)
+                message = "Below recommended markup percentage";
+
+            var value = this.Cost + (this.Cost * markupPercent / 100);
+
+            var operationResult = new OperationResult<decimal>(value, message);
+            return operationResult;
+        }
+
 
         public override string ToString()
         {
