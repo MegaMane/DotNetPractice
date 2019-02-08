@@ -29,11 +29,20 @@ namespace Acme.Biz
             return vendor;
         }
 
-        public int RetrieveValue(string sql, int defaultValue)
+        public T RetrieveValue<T> (string sql, T defaultValue) where T : struct
         {
             // Call the database to retrieve the value
             // If no value is returned, return the default value
-            int value = defaultValue;
+            T value = defaultValue;
+
+            return value;
+        }
+
+        public String RetrieveValue(string sql, String defaultValue) 
+        {
+            // Call the database to retrieve the value
+            // If no value is returned, return the default value
+            var value = defaultValue;
 
             return value;
         }
