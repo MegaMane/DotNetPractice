@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Dev_UserDomainModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ConnectionStrings">
+          <Key>
+            <PropertyRef Name="EnterpriseId" />
+            <PropertyRef Name="ConnectionStringTypeId" />
+          </Key>
+          <Property Name="EnterpriseId" Type="int" Nullable="false" />
+          <Property Name="ConnectionStringTypeId" Type="int" Nullable="false" />
+          <Property Name="ConnectionString" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="CommandTimeout" Type="int" Nullable="false" />
+          <Property Name="TemplateFolder" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="ConnectionStringType">
+          <Key>
+            <PropertyRef Name="ConnectionStringTypeId" />
+          </Key>
+          <Property Name="ConnectionStringTypeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConnectionStringTypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DefaultPostFix" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Enterprise">
+          <Key>
+            <PropertyRef Name="EnterpriseId" />
+          </Key>
+          <Property Name="EnterpriseId" Type="int" Nullable="false" />
+          <Property Name="EnterpriseName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="NavModuleGroupId" Type="int" />
+          <Property Name="EnterpriseDomain" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Active" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ConnectionString_ConnectionStringType">
+          <End Role="ConnectionStringType" Type="Self.ConnectionStringType" Multiplicity="1" />
+          <End Role="ConnectionStrings" Type="Self.ConnectionStrings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ConnectionStringType">
+              <PropertyRef Name="ConnectionStringTypeId" />
+            </Principal>
+            <Dependent Role="ConnectionStrings">
+              <PropertyRef Name="ConnectionStringTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConnectionStrings_Enterprise">
+          <End Role="Enterprise" Type="Self.Enterprise" Multiplicity="1" />
+          <End Role="ConnectionStrings" Type="Self.ConnectionStrings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Enterprise">
+              <PropertyRef Name="EnterpriseId" />
+            </Principal>
+            <Dependent Role="ConnectionStrings">
+              <PropertyRef Name="EnterpriseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Dev_UserDomainModelStoreContainer">
+          <EntitySet Name="ConnectionStrings" EntityType="Self.ConnectionStrings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ConnectionStringType" EntityType="Self.ConnectionStringType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Enterprise" EntityType="Self.Enterprise" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ConnectionString_ConnectionStringType" Association="Self.FK_ConnectionString_ConnectionStringType">
+            <End Role="ConnectionStringType" EntitySet="ConnectionStringType" />
+            <End Role="ConnectionStrings" EntitySet="ConnectionStrings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConnectionStrings_Enterprise" Association="Self.FK_ConnectionStrings_Enterprise">
+            <End Role="Enterprise" EntitySet="Enterprise" />
+            <End Role="ConnectionStrings" EntitySet="ConnectionStrings" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Dev_UserDomainModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ConnectionString">
+          <Key>
+            <PropertyRef Name="EnterpriseId" />
+            <PropertyRef Name="ConnectionStringTypeId" />
+          </Key>
+          <Property Name="EnterpriseId" Type="Int32" Nullable="false" />
+          <Property Name="ConnectionStringTypeId" Type="Int32" Nullable="false" />
+          <Property Name="ConnectionString1" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CommandTimeout" Type="Int32" Nullable="false" />
+          <Property Name="TemplateFolder" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ConnectionStringType" Relationship="Self.FK_ConnectionString_ConnectionStringType" FromRole="ConnectionStrings" ToRole="ConnectionStringType" />
+          <NavigationProperty Name="Enterprise" Relationship="Self.FK_ConnectionStrings_Enterprise" FromRole="ConnectionStrings" ToRole="Enterprise" />
+        </EntityType>
+        <EntityType Name="ConnectionStringType">
+          <Key>
+            <PropertyRef Name="ConnectionStringTypeId" />
+          </Key>
+          <Property Name="ConnectionStringTypeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConnectionStringTypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DefaultPostFix" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ConnectionStrings" Relationship="Self.FK_ConnectionString_ConnectionStringType" FromRole="ConnectionStringType" ToRole="ConnectionStrings" />
+        </EntityType>
+        <EntityType Name="Enterprise">
+          <Key>
+            <PropertyRef Name="EnterpriseId" />
+          </Key>
+          <Property Name="EnterpriseId" Type="Int32" Nullable="false" />
+          <Property Name="EnterpriseName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NavModuleGroupId" Type="Int32" />
+          <Property Name="EnterpriseDomain" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ConnectionStrings" Relationship="Self.FK_ConnectionStrings_Enterprise" FromRole="Enterprise" ToRole="ConnectionStrings" />
+        </EntityType>
+        <Association Name="FK_ConnectionString_ConnectionStringType">
+          <End Role="ConnectionStringType" Type="Self.ConnectionStringType" Multiplicity="1" />
+          <End Role="ConnectionStrings" Type="Self.ConnectionString" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ConnectionStringType">
+              <PropertyRef Name="ConnectionStringTypeId" />
+            </Principal>
+            <Dependent Role="ConnectionStrings">
+              <PropertyRef Name="ConnectionStringTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConnectionStrings_Enterprise">
+          <End Role="Enterprise" Type="Self.Enterprise" Multiplicity="1" />
+          <End Role="ConnectionStrings" Type="Self.ConnectionString" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Enterprise">
+              <PropertyRef Name="EnterpriseId" />
+            </Principal>
+            <Dependent Role="ConnectionStrings">
+              <PropertyRef Name="EnterpriseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="UserDomainEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ConnectionStrings" EntityType="Self.ConnectionString" />
+          <EntitySet Name="ConnectionStringTypes" EntityType="Self.ConnectionStringType" />
+          <EntitySet Name="Enterprises" EntityType="Self.Enterprise" />
+          <AssociationSet Name="FK_ConnectionString_ConnectionStringType" Association="Self.FK_ConnectionString_ConnectionStringType">
+            <End Role="ConnectionStringType" EntitySet="ConnectionStringTypes" />
+            <End Role="ConnectionStrings" EntitySet="ConnectionStrings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConnectionStrings_Enterprise" Association="Self.FK_ConnectionStrings_Enterprise">
+            <End Role="Enterprise" EntitySet="Enterprises" />
+            <End Role="ConnectionStrings" EntitySet="ConnectionStrings" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Dev_UserDomainModelStoreContainer" CdmEntityContainer="UserDomainEntities">
+          <EntitySetMapping Name="ConnectionStrings">
+            <EntityTypeMapping TypeName="Dev_UserDomainModel.ConnectionString">
+              <MappingFragment StoreEntitySet="ConnectionStrings">
+                <ScalarProperty Name="EnterpriseId" ColumnName="EnterpriseId" />
+                <ScalarProperty Name="ConnectionStringTypeId" ColumnName="ConnectionStringTypeId" />
+                <ScalarProperty Name="ConnectionString1" ColumnName="ConnectionString" />
+                <ScalarProperty Name="CommandTimeout" ColumnName="CommandTimeout" />
+                <ScalarProperty Name="TemplateFolder" ColumnName="TemplateFolder" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ConnectionStringTypes">
+            <EntityTypeMapping TypeName="Dev_UserDomainModel.ConnectionStringType">
+              <MappingFragment StoreEntitySet="ConnectionStringType">
+                <ScalarProperty Name="ConnectionStringTypeId" ColumnName="ConnectionStringTypeId" />
+                <ScalarProperty Name="ConnectionStringTypeName" ColumnName="ConnectionStringTypeName" />
+                <ScalarProperty Name="DefaultPostFix" ColumnName="DefaultPostFix" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Enterprises">
+            <EntityTypeMapping TypeName="Dev_UserDomainModel.Enterprise">
+              <MappingFragment StoreEntitySet="Enterprise">
+                <ScalarProperty Name="EnterpriseId" ColumnName="EnterpriseId" />
+                <ScalarProperty Name="EnterpriseName" ColumnName="EnterpriseName" />
+                <ScalarProperty Name="NavModuleGroupId" ColumnName="NavModuleGroupId" />
+                <ScalarProperty Name="EnterpriseDomain" ColumnName="EnterpriseDomain" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

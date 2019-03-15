@@ -1,0 +1,3 @@
+Support Tool = Ado.net and windows forms
+OpComm_SFTPUpload = zipping files and uploading to SFTP
+FanaticsPreprocessor = reading from csv and sending emails

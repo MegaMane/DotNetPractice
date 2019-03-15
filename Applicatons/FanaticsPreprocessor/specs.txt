@@ -1,0 +1,13 @@
+Read in the whole file
+strip the headers of white space and check against header template
+	If correct
+		Move on to file validation
+			If Validation correct check required data fields I.E. Department, Category, Supplier, Supplier Cost, MSRP for an import  check required Import fields, check field lengths
+				Write out new file (overwrite) with stripped headers and quoted fields
+			Else
+				Return File with validation errors rename file to _invalid and move to history
+
+	Else
+		email file with header issues With an email that contains the expected and received headers rename file to _invalid and move to history
+
+

@@ -16,6 +16,11 @@ namespace Cars
             var query = cars.OrderByDescending(c => c.Combined)
                             .ThenBy(c => c.Name);
 
+            var anon = new
+            {
+                Name ="Jon"
+            };
+
             //query syntax equivalant
             var query1 =
                 from car in cars
@@ -24,11 +29,23 @@ namespace Cars
                 orderby car.Combined descending, car.Name ascending
                 select car;
 
+            var query2 =
+               from car in cars
+               where car.Manufacturer == "BMW"
+               && car.Year == 2016
+               orderby car.Combined descending, car.Name ascending
+               select new
+               {
+                   Manufacturer = car.Manufacturer,
+                   Name = car.Name,
+                   Combined = car.Combined
+               };
+
             var top =
                 cars.Where(c => c.Manufacturer == "BMW" && c.Year == 2016)
                     .OrderByDescending(c => c.Combined)
                     .ThenBy(c => c.Name)
-                    .Select(c => c)
+                    .Select(c => new { c.Manufacturer, c.Name, c.Combined })
                     .First();
 
 
@@ -52,10 +69,13 @@ namespace Cars
 
             */
 
-            return File.ReadAllLines(path) //Returns string array
+            var query = File.ReadAllLines(path) //Returns string array
                 .Skip(1) //Skip the headers
-                .Where(line => line.Length > 1) //there is an empty line at the end of the file we want to ignore
-                .Select(Car.ParseFromCsv).ToList();
+                .Where(line => line.Length > 1) 
+                .ToCar();
+            //.Select(Car.ParseFromCsv).ToList();
+
+            return query.ToList();
 
             /*
    
