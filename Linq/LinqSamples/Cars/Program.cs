@@ -11,16 +11,13 @@ namespace Cars
     {
         static void Main(string[] args)
         {
-            var cars = ProcessFile("fuel.csv");
+            var cars = ProcessCars("fuel.csv");
+
+            var manufacturers = ProcessManufacturers("manufacturers.csv");
 
             var query = cars.OrderByDescending(c => c.Combined)
                             .ThenBy(c => c.Name);
-
-            var anon = new
-            {
-                Name ="Jon"
-            };
-
+           
             //query syntax equivalant
             var query1 =
                 from car in cars
@@ -58,26 +55,17 @@ namespace Cars
             Console.ReadLine();
         }
 
-        private static List<Car> ProcessFile(string path)
+        private static List<Car> ProcessCars(string path)
         {
             /*
             return File.ReadAllLines(path) //Returns string array
                         .Skip(1) //Skip the headers
                         .Where(line => line.Length > 1) //there is an empty line at the end of the file we want to ignore
-                        .Select(l => Car.ParseFromCsv(l))
+                        .Select(l => Car.ParseFromCsv(l)).ToList();
+                        //two different ways of making the same call
+                        //.Select(Car.ParseFromCsv).ToList();
 
 
-            */
-
-            var query = File.ReadAllLines(path) //Returns string array
-                .Skip(1) //Skip the headers
-                .Where(line => line.Length > 1) 
-                .ToCar();
-            //.Select(Car.ParseFromCsv).ToList();
-
-            return query.ToList();
-
-            /*
    
              //Query Syntax Equivalant
              var query =
@@ -87,9 +75,39 @@ namespace Cars
 
             return query.ToList();
              
-             */
+    
+
+            */
+
+
+            var query = File.ReadAllLines(path)
+                .Skip(1)
+                .Where(line => line.Length > 1)
+                .ToCar(); //define an extension method for Ienumarable of String that converts the filtered string output to a car object
+
+
+            return query.ToList(); 
+
+
         }
 
+        private static List<Manufacturer> ProcessManufacturers(string path)
+        {
+            var query = File.ReadAllLines(path)
+                            .Where(line => line.Length > 1)
+                            .Select(line => 
+                            {
+                                var columns = line.Split(',');
+                                return new Manufacturer()
+                                {
+                                    Name = columns[0],
+                                    Headquarters = columns[1],
+                                    Year = int.Parse(columns[2])
+                                };
+                            });
+
+            return query.ToList();
+        }
 
     }
 }
