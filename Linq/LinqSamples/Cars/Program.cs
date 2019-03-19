@@ -15,7 +15,63 @@ namespace Cars
 
             var manufacturers = ProcessManufacturers("manufacturers.csv");
 
-            var query = cars.OrderByDescending(c => c.Combined)
+            var query =
+                from car in cars
+                group car by car.Manufacturer;
+
+            foreach (var group in query)
+            {
+                Console.WriteLine(group.Key);
+                foreach (var car in group.OrderByDescending(c => c.Combined).Take(2))
+                {
+                    Console.WriteLine($"\t{car.Name}: {car.Combined}");
+                }
+            }
+            Console.ReadLine();
+
+
+
+
+            var queryJoin =
+                from car in cars
+                join manufacturer in manufacturers
+                on car.Manufacturer equals manufacturer.Name
+                orderby car.Combined descending, car.Name ascending
+                select new
+                {
+                    manufacturer.Headquarters,
+                    car.Name,
+                    car.Combined
+                };
+
+            var queryMultipleJoinConditions =
+                from car in cars
+                join manufacturer in manufacturers
+                on new { car.Manufacturer , car.Year} equals 
+                new {Manufacturer = manufacturer.Name, manufacturer.Year }
+                orderby car.Combined descending, car.Name ascending
+                select new
+                {
+                    manufacturer.Headquarters,
+                    car.Name,
+                    car.Combined
+                };
+
+            //use the query syntax when doing joins this is fucking atrocious
+            var queryMethodSyntax =
+                cars.Join(manufacturers, //Inner sequence shold be the smaller of the two
+                          car => car.Manufacturer, //outer sequence (in this case cars) join condition
+                          manufacturer => manufacturer.Name, //inner sequence join condition
+                          (car, manufacturer) => new //projection of new combined object returned (basically the select)
+                          {
+                              manufacturer.Headquarters,
+                              car.Name,
+                              car.Combined
+                          })
+                          .OrderByDescending(c => c.Combined)
+                          .ThenBy(c => c.Name);
+
+            var query4 = cars.OrderByDescending(c => c.Combined)
                             .ThenBy(c => c.Name);
            
             //query syntax equivalant
@@ -47,9 +103,9 @@ namespace Cars
 
 
 
-            foreach(var car in query.Take(10))
+            foreach(var car in queryMethodSyntax.Take(10))
             {
-                Console.WriteLine($"{car.Name}: {car.Combined}");
+                Console.WriteLine($"{car.Headquarters}: {car.Name}: {car.Combined}");
             }
 
             Console.ReadLine();
