@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,104 +12,54 @@ namespace Cars
     {
         static void Main(string[] args)
         {
+            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<CarDb>());
+            InsertData();
+            QueryData();
+        }
+
+        private static void QueryData()
+        {
+            var db = new CarDb();
+
+            var query = from car in db.Cars
+                        orderby car.Combined descending, car.Name ascending
+                        select car;
+
+            var queryExt =
+                db.Cars.OrderByDescending(c => c.Combined)
+                       .ThenBy(c => c.Name)
+                       .Take(10);
+
+            foreach (var car in queryExt)
+            {
+                Console.WriteLine($"{car.Name}: {car.Combined}");
+            }
+
+            Console.ReadLine();
+        }
+
+        private static void InsertData()
+        {
+
             var cars = ProcessCars("fuel.csv");
+            var db = new CarDb();
 
-            var manufacturers = ProcessManufacturers("manufacturers.csv");
+            var currentRows = db.Cars.Count();
 
-            var query =
-                from car in cars
-                group car by car.Manufacturer;
+            db.Database.Log = Console.WriteLine;
 
-            foreach (var group in query)
+            if (!db.Cars.Any())
             {
-                Console.WriteLine(group.Key);
-                foreach (var car in group.OrderByDescending(c => c.Combined).Take(2))
+                foreach (var car in cars)
                 {
-                    Console.WriteLine($"\t{car.Name}: {car.Combined}");
+                    db.Cars.Add(car);
                 }
-            }
-            Console.ReadLine();
 
-
-
-
-            var queryJoin =
-                from car in cars
-                join manufacturer in manufacturers
-                on car.Manufacturer equals manufacturer.Name
-                orderby car.Combined descending, car.Name ascending
-                select new
-                {
-                    manufacturer.Headquarters,
-                    car.Name,
-                    car.Combined
-                };
-
-            var queryMultipleJoinConditions =
-                from car in cars
-                join manufacturer in manufacturers
-                on new { car.Manufacturer , car.Year} equals 
-                new {Manufacturer = manufacturer.Name, manufacturer.Year }
-                orderby car.Combined descending, car.Name ascending
-                select new
-                {
-                    manufacturer.Headquarters,
-                    car.Name,
-                    car.Combined
-                };
-
-            //use the query syntax when doing joins this is fucking atrocious
-            var queryMethodSyntax =
-                cars.Join(manufacturers, //Inner sequence shold be the smaller of the two
-                          car => car.Manufacturer, //outer sequence (in this case cars) join condition
-                          manufacturer => manufacturer.Name, //inner sequence join condition
-                          (car, manufacturer) => new //projection of new combined object returned (basically the select)
-                          {
-                              manufacturer.Headquarters,
-                              car.Name,
-                              car.Combined
-                          })
-                          .OrderByDescending(c => c.Combined)
-                          .ThenBy(c => c.Name);
-
-            var query4 = cars.OrderByDescending(c => c.Combined)
-                            .ThenBy(c => c.Name);
-           
-            //query syntax equivalant
-            var query1 =
-                from car in cars
-                where car.Manufacturer == "BMW"
-                && car.Year == 2016
-                orderby car.Combined descending, car.Name ascending
-                select car;
-
-            var query2 =
-               from car in cars
-               where car.Manufacturer == "BMW"
-               && car.Year == 2016
-               orderby car.Combined descending, car.Name ascending
-               select new
-               {
-                   Manufacturer = car.Manufacturer,
-                   Name = car.Name,
-                   Combined = car.Combined
-               };
-
-            var top =
-                cars.Where(c => c.Manufacturer == "BMW" && c.Year == 2016)
-                    .OrderByDescending(c => c.Combined)
-                    .ThenBy(c => c.Name)
-                    .Select(c => new { c.Manufacturer, c.Name, c.Combined })
-                    .First();
-
-
-
-            foreach(var car in queryMethodSyntax.Take(10))
-            {
-                Console.WriteLine($"{car.Headquarters}: {car.Name}: {car.Combined}");
+                var rowsInserted = db.Cars.Count();
+                db.SaveChanges();
             }
 
-            Console.ReadLine();
+            
         }
 
         private static List<Car> ProcessCars(string path)
